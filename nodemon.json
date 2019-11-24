@@ -1,0 +1,8 @@
+{
+  "_comment" : "this file is configuration for nodemon",
+  "env": {
+    "MONGO_USER" : "revanth",
+    "MONGO_PASSWORD" : "j8rw7oMNTRrtnyaa",
+    "MONGO_DB" : "events-react-dev"
+  }
+}
