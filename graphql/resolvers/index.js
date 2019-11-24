@@ -5,29 +5,25 @@ const Booking = require('../../models/booking')
 const bcrypt = require('bcryptjs');
 
 
-var counter =    1;
 /**
  * This method returns the user if found for particular userId
  * @param userId
  * @returns {Promise<T | never>}
  */
-const user = (userId) => {
+const user = async (userId) => {
 
-    return User
-        .findById(userId)
-        .then(user => {
-            if (!user) {
-                throw Error("User not found");
-            }
-            console.log(counter++)
-            return {
-                ...user._doc,
-                createdEvents: events.bind(this ,user.createdEvents)
-            };
-        })
-        .catch(err => {
-            throw err;
-        })
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw Error("User not found");
+        }
+        return {
+            ...user._doc,
+            createdEvents: events.bind(this, user.createdEvents)
+        };
+    } catch (e) {
+        throw e;
+    }
 
 };
 
@@ -36,79 +32,73 @@ const user = (userId) => {
  * @param eventIds
  * @returns {Promise<T | never>}
  */
-const events = (eventIds) => {
-    return Event.find({_id: {$in: eventIds}})
-        .then(events => {
-            return events.map((event) => {
-                return {
-                    ...event._doc,
-                    creator: user.bind(this, event.creator)
-                }
-            })
-        })
-        .catch(err => {
-            throw err;
-        })
+const events = async (eventIds) => {
+
+    try {
+        const events = await Event.find({_id: {$in: eventIds}});
+        return events.map((event) => {
+            return {
+                ...event._doc,
+                creator: user.bind(this, event.creator)
+            }
+        });
+    } catch (err) {
+        throw err
+    }
+
 };
 
 
 const eventRootValue = {
-    events: () => {
-        return Event
-            .find()
-            .then(events => {
-                return events.map(event => {
-                    //console.log(event.creator);
-                    return {
-                        ...event._doc,
-                        date : new Date(event._doc.date).toISOString(),
-                        creator: user.bind(this,event.creator)
-                    };
-                })
-            }).catch(err => {
-                console.log(err);
-            })
-    },
-    createEvent: (args) => {
-        const event = new Event({
-            title: args.eventInput.title,
-            description: args.eventInput.description,
-            price: +args.eventInput.price,
-            date: new Date(),
-            creator: "5dd9ee61b2a78a0d0c591965"
-        });
-
-        var createdEvent;
-        return event
-            .save()
-            .then((result) => {
-                createdEvent = {
-                    ...result._doc,
-                    date : new Date(result._doc.data).toISOString(),
-                    creator : user(result._doc.creator)
+    events: async () => {
+        try {
+            const events = await Event.find();
+            return events.map(event => {
+                //console.log(event.creator);
+                return {
+                    ...event._doc,
+                    date: new Date(event._doc.date).toISOString(),
+                    creator: user.bind(this, event.creator)
                 };
-                return User.findById("5dd9ee61b2a78a0d0c591965");
             })
-            .then(user => {
-                if (!user) {
-                    throw new Error('user not found.')
-                }
-                user.createdEvents.push(event);
-                return user.save();
-            })
-            .then(result => {
-                return {...createdEvent, creator : user(createdEvent.creator)};
-            })
-            .catch(err => {
-                console.log(err);
-                throw err;
-            });
+        } catch (err) {
+            throw err;
+        }
     },
-    event: () => {
-        return "All Time Coding"
+    createEvent: async (args) => {
+        try {
+            const event = new Event({
+                title: args.eventInput.title,
+                description: args.eventInput.description,
+                price: + args.eventInput.price,
+                date: new Date(),
+                creator: "5dd9ee61b2a78a0d0c591965"
+            });
+            const result = await event
+                .save();
+            console.log("event saved successfully");
+            var createdEvent = {
+                ...result._doc,
+                date: new Date(result._doc.date).toISOString(),
+                creator: user(result._doc.creator)
+            };
+            const foundUser = await User.findById("5dd9ee61b2a78a0d0c591965");
+            if (!foundUser) {
+                throw new Error('user not found.')
+            }
+            foundUser.createdEvents.push(event);
+            console.log("event added to user");
+            await foundUser.save();
+            console.log("user saved successfully");
+
+            return createdEvent;
+        } catch (err) {
+            throw err;
+        }
     },
     createUser: (args) => {
-        return User.findOne({email: args.userInput.email})
+        return User
+            .findOne({email: args.userInput.email})
             .then(user => {
                 if (user) {
                     throw new Error('user existss already.')
@@ -131,47 +121,42 @@ const eventRootValue = {
             })
 
     },
-    booking : (args) => {
-        return Booking
-            .find()
-            .then(bookings => {
-                return bookings.map((booking) => {
+    bookings: async () => {
+        try {
+            const bookings = await Booking.find();
 
-                    return {
-                        ...booking._doc,
-                        createdAt : new Date(booking._doc.createdAt).toISOString(),
-                        updatedAt : new Date(booking._doc.updatedAt).toISOString()
-                    }
-                })
-            })
-            .catch(err => {
-                throw err;
-            })
-    },
-    bookEvent: (args) => {
-        var eventId = args.eventId;
-        return Event.findOne({_id : args.eventId})
-            .then(event => {
-                const booking = new Booking({
-                    event : event,
-                    user : '5dd9ee61b2a78a0d0c591965'
-                });
-               return booking.save();
-            })
-            .then(result => {
-                console.log("event booked succesfully")
-                console.log(result._doc);
+            return bookings.map((booking) => {
                 return {
-                    ...result._doc,
-                    createdAt : new Date(result._doc.createdAt).toISOString(),
-                    updatedAt : new Date(result._doc.updatedAt).toISOString()
+                    ...booking._doc,
+                    createdAt: new Date(booking._doc.createdAt).toISOString(),
+                    updatedAt: new Date(booking._doc.updatedAt).toISOString(),
+                    user : user.bind(this, booking._doc.user)
                 }
-            })
-            .catch(err => {
-                throw err;
-            })
+            });
+        } catch (e) {
+            throw e;
+        }
+    },
+    bookEvent: async (args) => {
+        try {
+            const event = await Event.findOne({_id: args.eventId});
+            const booking = new Booking({
+                event: event,
+                user: '5dd9ee61b2a78a0d0c591965'
+            });
+            const bookingResult = await booking.save();
+            console.log("event booked successfully");
 
+            return {
+                ...bookingResult._doc,
+                createdAt: new Date(bookingResult._doc.createdAt).toISOString(),
+                updatedAt: new Date(bookingResult._doc.updatedAt).toISOString(),
+                user : user.bind(this, booking._doc.user)
+            }
+        } catch (e) {
+            throw e;
+        }
     }
-}
+};
 
 module.exports = eventRootValue;

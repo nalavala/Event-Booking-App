@@ -35,16 +35,3 @@ mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${
 }).catch(err => {
     console.log(err);
 });
-
-/*mongoose.connect(`mongodb://${process.env.MONGO_USER}:${
-    process.env.MONGO_PASSWORD
-    }@sample.com:port/${process.env.MONGO_DB}`, { useNewUrlParser: true })
-    .then(() => {
-        console.log("mongo DB connected")
-        app.listen(1742);
-    }).catch(err => {
-    console.log(err);
-});*/
-
-
-
