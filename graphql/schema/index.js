@@ -46,7 +46,7 @@ const eventSchema = buildSchema(`
         createEvent(eventInput : EventInput) : Event
         createUser(userInput : UserInput) : User
         bookEvent(eventId : ID!) : Booking!
-        cancelBooking(eventID : ID!) : Event!
+        cancelBooking(bookingId : ID!) : Event!
     }
     schema {
         query : RootQuery
