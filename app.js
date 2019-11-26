@@ -6,12 +6,14 @@ const mongoose = require('mongoose');
 // graphql schemas and rootvalues
 const graphqlSchema = require('./graphql/schema/index');
 const graphqlRoolValue = require('./graphql/resolvers/index');
+// Middle ware
+const authFilter = require('./filters/auth');
 
 // It create a express app server
 const app = new express();
 
 app.use(bodyParser.json());
-
+app.use(authFilter);
 app.use('/graphql', graphQLHTTP({
 
     // This schema defination which gets exposed to UI to request data
