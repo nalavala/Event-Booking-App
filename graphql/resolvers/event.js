@@ -25,14 +25,14 @@ module.exports = {
                 title: args.eventInput.title,
                 description: args.eventInput.description,
                 price: +args.eventInput.price,
-                date: new Date(),
+                date: args.eventInput.date,
                 creator: req.userId
             });
             const result = await event
                 .save();
             console.log("event saved successfully");
             var createdEvent = transformEvent(result);
-            const foundUser = await User.findById("5dd9ee61b2a78a0d0c591965");
+            const foundUser = await User.findById(req.userId);
             if (!foundUser) {
                 throw new Error('user not found.')
             }

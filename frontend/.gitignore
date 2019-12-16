@@ -23,10 +23,3 @@ yarn-debug.log*
 yarn-error.log*
 
 
-.idea/graphql-event-booking-app.iml
-.idea/misc.xml
-.idea/modules.xml
-.idea/vcs.xml
-.idea/workspace.xml
-.idea/watcherTasks.xml
-

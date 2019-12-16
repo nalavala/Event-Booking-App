@@ -30,6 +30,7 @@ const eventSchema = buildSchema(`
         title : String!
         description : String!
         price : Float!
+        date : String!
     }
     
     input UserInput {

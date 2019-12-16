@@ -2,3 +2,30 @@
 2. add cancel booking resolvers   -  done
 3. add single event resovler in booking resolver  -  done
 4. User authentication and autroziation
+5. create file to send backend calls
+6. create a button onclick it should clear entire date in database
+7. Handle errors properly
+8. create settings page to set header, button background and text color based on user actions
+9 .JWT needs to be stored inside an httpOnly cookie,
+10. Move hover css to common and use same for all buttons in app
+11. Handle invalide credentials in UI
+12. Resuse button css where are buttons are used
+13. use save css for event form and auth form
+14.
+    label {
+      width : 100%;
+      display : block;
+      margin-bottom: 0.5rem;
+    }
+
+    input {
+      width : 100%;
+      display : block
+    }
+
+    textarea {
+      width : 100%;
+      display : block
+    }
+    try to reuse same code
+15. use static for auth context in event.js
