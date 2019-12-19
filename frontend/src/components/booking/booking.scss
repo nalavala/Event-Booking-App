@@ -1,0 +1,35 @@
+.booking_list {
+  list-style: none;
+  padding: 0;
+  margin: auto;
+  width: 40rem;
+  max-width: 90%;
+
+
+  .booking_list_item {
+    border: 1px solid #5101d1;
+    padding: 0.5rem;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+
+
+    .booking_list_item_actions {
+      button {
+        text-decoration: none;
+        color: #ffffff;
+        padding: 0.25rem 0.5rem;
+        border: none;
+        font: inherit;
+        background: #5101d1;
+        cursor: pointer;
+        vertical-align: middle;
+        margin: 0;
+        border-radius: 5px;
+      }
+    }
+  }
+
+
+}

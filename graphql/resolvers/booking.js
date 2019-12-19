@@ -4,12 +4,11 @@ const {transformBooking, transformEvent} = require('./commonresolvers');
 
 module.exports = {
     bookings: async (args, req) => {
-        if(!req.isAuth) {
-            throw Error("Not Authenticated");
+        if (!req.isAuth) {
+            //throw Error("Not Authenticated");
         }
         try {
-            const bookings = await Booking.find();
-
+            const bookings = await Booking.find({user: req.userId});
             return bookings.map((booking) => {
                 return transformBooking(booking);
             });
@@ -18,7 +17,7 @@ module.exports = {
         }
     },
     bookEvent: async (args, req) => {
-        if(!req.isAuth) {
+        if (!req.isAuth) {
             throw Error("Not Authenticated");
         }
         try {
@@ -36,7 +35,7 @@ module.exports = {
         }
     },
     cancelBooking: async (args, req) => {
-        if(!req.isAuth) {
+        if (!req.isAuth) {
             throw Error("Not Authenticated");
         }
         try {
@@ -44,7 +43,7 @@ module.exports = {
             if (!booking) {
                 throw Error("No bookings found for id: " + args.bookingId);
             }
-            console.log(booking);
+            console.log("fetched booking" + booking);
             const event = transformEvent(booking.event);
             await Booking.deleteOne({_id: args.bookingId});
             return event;

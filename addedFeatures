@@ -29,3 +29,10 @@
     }
     try to reuse same code
 15. use static for auth context in event.js
+16. Use notification to show creation and cancel notifications
+17. use Common font size ans style
+18. Load screen till graph ql is connected
+19. add max width to a authentication form
+20. add logging feature for every database call or mutation
+21. add feature to avoid duplicate bookings
+22. add error handling ********

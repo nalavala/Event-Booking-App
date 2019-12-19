@@ -4,7 +4,7 @@ import BackDrop from "../../Backdrop";
 import AuthContext from "../../context/auth-context"
 import "./events.scss"
 import EventList from "./EventList";
-import Spinner from "./../spinner/Spinner"
+import Spinner from "./../spinner/Spinner";
 
 
 function EventsPage() {
@@ -18,12 +18,8 @@ function EventsPage() {
     });
     const [events, setEvents] = useState([]);
     const [isLoading, setLoading] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null)
-    const authContext = useContext(AuthContext);;
-    console.log("auth" + authContext);
-
-
-
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const authContext = useContext(AuthContext);
 
     const fetchEvents = () => {
         setLoading(true);
@@ -41,7 +37,7 @@ function EventsPage() {
     }
   }
 }`
-        }
+        };
 
 
         fetch('http://localhost:1742/graphql', {
@@ -67,8 +63,8 @@ function EventsPage() {
             throw e;
         });
 
-    }
-    useEffect(fetchEvents, [])
+    };
+    useEffect(fetchEvents, []);
 
     const createEvent = () => {
 
@@ -83,7 +79,7 @@ function EventsPage() {
     description
   }
 }`
-        }
+        };
 
 
         fetch('http://localhost:1742/graphql', {
@@ -111,8 +107,8 @@ function EventsPage() {
                 creator : {
                     _id : authContext.userId,
                 }
-            })
-            console.log("updatedEvents" + updatedEvents)
+            });
+            console.log("updatedEvents" + updatedEvents);
             setEvents(updatedEvents);
         }).catch((e) => {
             throw e;
@@ -134,31 +130,61 @@ function EventsPage() {
             case "description" :
                 setEvent({...event, description : evnt.target.value});
                 break;
-
-
         }
-
-    }
+    };
 
     const viewDetailsHandler = (eventId)  => {
        const selectedEvent =  events.find(event => {
             return event._id == eventId;
         });
         setSelectedEvent(selectedEvent);
-    }
+    };
 
     const handleCreateEventClicked = () => {
         setEventCreatingState(!creating)
-    }
+    };
 
     const createEventHandler = () => {
         createEvent();
         setEventCreatingState(false);
         setSelectedEvent(null);
-    }
+    };
     const bookEventHandler = (eventId) => {
-
         console.log(eventId);
+
+
+
+        const  requestBody = {
+            query:`
+                mutation {
+  bookEvent(eventId : "${eventId}") {
+    _id
+  }
+}`
+        };
+
+
+        fetch('http://localhost:1742/graphql', {
+            method : 'POST',
+            body : JSON.stringify(requestBody),
+            headers : {
+                'Content-Type' : 'application/json',
+                'Authorization' : "Bearer " + authContext.token
+            }
+        }).then((response) => {
+            if(response.status !== 200 && response.status !== 201) {
+                //TODO : dont throw error
+                throw new Error('Failed');
+            }
+
+            return response.json();
+        } ).then((response) => {
+            console.log(response);
+        }).catch((e) => {
+            throw e;
+        });
+
+
         setSelectedEvent(null);
     };
     const modalCancelHandler = () => {
@@ -238,7 +264,7 @@ function EventsPage() {
 
 
 
-    }
+    };
 
 
     return getViewAccordingContext();

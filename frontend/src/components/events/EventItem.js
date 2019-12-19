@@ -10,7 +10,7 @@ const EventItem = (props) => {
     }
     return (
         <li className="event_list_item">
-            <div>
+            <div className="event_list_item_data">
                 <h1>
                     {props.title}
                 </h1>
@@ -18,7 +18,7 @@ const EventItem = (props) => {
                     ${props.price} - {new Date(props.date).toLocaleString()}
                 </h2>
             </div>
-            <div>
+            <div className="event_list_item_actions">
                 {
                     !isUserCreator ? <button onClick={eventViewHandler.bind(this, props.eventId)}>View Details</button> :
                         <p> you are owner of this event</p>
