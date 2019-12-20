@@ -21,24 +21,32 @@ function AuthPage() {
         }
         //console.log(email,password);
         let requestBody = {
-            query : `query {
-                login(email : "${email}", password : "${password}") {
+            query : `query Login ($email : String!, $password : String!) {
+                login(email : $email, password : $password) {
                     userId 
                     email 
                     token 
                     tokenExpiration
                 }
-            }`
+            }`,
+            variables : {
+                email,
+                password
+            }
         };
 
         if(!isLogin) {
             requestBody = {
                 query:`
-                mutation {
-  createUser(userInput : {email: "${email}",password: "${password}"}) {
-    _id
-  }
-}`
+                mutation CreateUser($email : String!, $password : String!){
+                  createUser(userInput : {email: $email,password: $password}) {
+                    _id
+                  }
+                }`,
+                variables : {
+                    email,
+                    password
+                }
         }
 
         };

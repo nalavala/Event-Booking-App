@@ -15,22 +15,23 @@ function BookingsPage() {
 
         setLoading(true);
         const  requestBody = {
-            query:`
+            query: `
                 query {
-  bookings {
-    _id
-    createdAt
-    updatedAt
-    event {
-    _id
-    title
-    price
-    }
-    user{
-    _id
-    }
-  }
-}`
+                  bookings {
+                    _id
+                    createdAt
+                    updatedAt
+                    event {
+                    _id
+                    title
+                    price
+                    }
+                    user{
+                    _id
+                    }
+                  }
+                }
+              `
         };
 
 
@@ -70,11 +71,16 @@ function BookingsPage() {
 
         const  requestBody = {
             query:`
-                mutation {
-  cancelBooking(bookingId : "${bookingId}") {
+                mutation cancelBooking ($id : ID!) {
+  cancelBooking(bookingId : $id) {
     _id
   }
-}`
+}`,
+            variables : {
+                id : bookingId
+            }
+
+
         };
 
 

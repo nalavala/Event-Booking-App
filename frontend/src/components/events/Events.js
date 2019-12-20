@@ -70,15 +70,23 @@ function EventsPage() {
 
         const  requestBody = {
             query:`
-                mutation {
-  createEvent(eventInput : {title: "${event.title}",price: ${event.price},date: "${event.date}",description : "${event.description}"}) {
-    _id
-    title
-    date
-    title
-    description
-  }
-}`
+                mutation createEvent ($title : String!, $price : Float!, $date : String!, $description : String!){
+                  createEvent(eventInput : {title: $title,price: $price,date: $date,description : $description}) {
+                    _id
+                    title
+                    date
+                    title
+                    description
+                  }
+                }`,
+            variables : {
+                title : event.title,
+                price : +event.price,
+                date : event.date,
+                description : event.description
+
+            }
+
         };
 
 

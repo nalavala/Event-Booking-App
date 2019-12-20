@@ -1,6 +1,19 @@
 const User = require('../../models/user');
 const Event = require('../../models/event');
-const {dateToString} = require('../../helpers/date')
+const {dateToString} = require('../../helpers/date');
+// Dataloader used to batch the queries to database and execute in single go
+const DataLoader = require('dataloader');
+
+
+const userLoader = new DataLoader((keys) => {
+    return User.find({_id : {$in : keys}});
+
+});
+
+const eventLoader = new DataLoader(keys => {
+    return events(keys);
+});
+
 /**
  * This method returns the user if found for particular userId
  * @param userId
@@ -9,13 +22,14 @@ const {dateToString} = require('../../helpers/date')
 const user = async (userId) => {
 
     try {
-        const user = await User.findById(userId);
+        const user = await userLoader.load(userId.toString());
         if (!user) {
             throw Error("User not found");
         }
+        console.log( user.createdEvents);
         return {
             ...user._doc,
-            createdEvents: events.bind(this, user.createdEvents)
+            createdEvents: () => eventLoader.loadMany(user.createdEvents)
         };
     } catch (e) {
         throw e;
@@ -47,8 +61,8 @@ const events = async (eventIds) => {
 // TODO : add resolver for single event
 const singleEvent = async (eventId) => {
     try {
-        const event = await Event.findById(eventId)
-        return transformEvent(event);
+        const event = await eventLoader.load(eventId.toString())
+        return event;
     } catch (e) {
         throw e;
     }
@@ -80,7 +94,7 @@ const transformEvent = (event) => {
     return {
         ...event._doc,
         date: dateToString(event._doc.date),
-        creator: user(event._doc.creator)
+        creator: user.bind(this,event._doc.creator)
     }
 };
 
