@@ -16,7 +16,7 @@
     h1 {
       margin: 0;
       font-size: 1.5rem;
-      color: #dfcefc;
+      color: inherit;
     }
   }
 
@@ -36,7 +36,7 @@
 
         a,button {
           text-decoration: none;
-          color: white;
+          color: inherit;
           padding: 0.25rem 0.5rem;
           border: none;
           font: inherit;

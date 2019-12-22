@@ -1,7 +1,10 @@
 import React, { useState , useContext } from 'react';
 import AuthContext from './../context/auth-context'
+import { useSnackbar } from 'notistack';
 import './Auth.scss'
+
 function AuthPage() {
+    const { enqueueSnackbar } = useSnackbar();
     let emailElement = React.createRef();
     let passwordElement = React.createRef();
 
@@ -60,7 +63,7 @@ function AuthPage() {
             }
         }).then((response) => {
             if(response.status !== 200 && response.status !== 201) {
-                throw new Error('Failed');
+                console.log(response.json());
             }
 
             return response.json();

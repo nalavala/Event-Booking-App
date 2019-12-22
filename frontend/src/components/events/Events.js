@@ -5,9 +5,11 @@ import AuthContext from "../../context/auth-context"
 import "./events.scss"
 import EventList from "./EventList";
 import Spinner from "./../spinner/Spinner";
+import { useSnackbar } from 'notistack';
 
 
 function EventsPage() {
+    const { enqueueSnackbar } = useSnackbar();
 
     const [creating, setEventCreatingState] = useState(false);
     const [event, setEvent] = useState({
@@ -118,6 +120,9 @@ function EventsPage() {
             });
             console.log("updatedEvents" + updatedEvents);
             setEvents(updatedEvents);
+            enqueueSnackbar("Event Created Successfully", {
+                variant : "success"
+            })
         }).catch((e) => {
             throw e;
         });
@@ -185,6 +190,9 @@ function EventsPage() {
                 throw new Error('Failed');
             }
 
+            enqueueSnackbar("Event Booked Successfully", {
+                variant : "success"
+            });
             return response.json();
         } ).then((response) => {
             console.log(response);

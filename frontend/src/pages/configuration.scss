@@ -1,0 +1,29 @@
+.config {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid purple;
+  padding: 7px;
+  box-sizing: border-box;
+  width: 22rem;
+  align-items: center;
+  max-width: 90%;
+  margin: auto;
+
+  .config_text {
+
+    h1 {
+      margin: 0;
+      display: inline-block;
+      width: 13rem;
+    }
+  }
+
+  .config_background {
+    h1 {
+      margin: 0;
+      display: inline-block;
+      width: 13rem;
+    }
+  }
+
+}

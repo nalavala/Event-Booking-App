@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
+const {errorName} = require('./../error/error-contants')
 
 
 module.exports = {
@@ -39,7 +40,7 @@ module.exports = {
         const isEqual = await bcrypt.compare(password, user.password);
 
         if (!isEqual) {
-            throw Error("Invalid Credentials i.e incorrect password");
+            throw new Error(errorName.INVALID_CREDENTIALS);
         }
 
         //2. generate token
