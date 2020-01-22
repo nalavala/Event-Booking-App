@@ -8,18 +8,6 @@
   margin: 1rem auto;
   border-radius: 5px;
 
-  button {
-    text-decoration: none;
-    color: #ffffff;
-    padding: 0.25rem 0.5rem;
-    border: none;
-    font: inherit;
-    background: #5101d1;
-    cursor: pointer;
-    vertical-align: middle;
-    margin: 0;
-    border-radius: 5px;
-  }
 
 }
 
@@ -48,22 +36,7 @@
   }
 
   .form-action {
-    button {
-      // global background color
-      background-color: grey;
-      border: 1px solid grey;
-      border-radius: 3px;
-      padding: 0.25rem 0.5rem;
-      margin-right: 1rem;
-      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.26);
-      color: white;
-      font: inherit;
-      cursor: pointer;
 
-      &:hover {
-        background-color: #707c80;
-      }
-    }
   }
 }
 
@@ -94,17 +67,5 @@
     color : gray;
   }
 
-  button {
-    text-decoration: none;
-    color: #ffffff;
-    padding: 0.25rem 0.5rem;
-    border: none;
-    font: inherit;
-    background: #5101d1;
-    cursor: pointer;
-    vertical-align: middle;
-    margin: 0;
-    border-radius: 5px;
-  }
 
 }

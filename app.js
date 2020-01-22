@@ -8,7 +8,7 @@ const graphqlSchema = require('./graphql/schema/index');
 const graphqlRoolValue = require('./graphql/resolvers/index');
 // Middle ware
 const authFilter = require('./filters/auth');
-const getErrorCode = require('./graphql/error/errorcodes')
+const getErrorCode = require('./graphql/error/errorcodes');
 
 // It create a express app server
 const app = new express();
@@ -35,16 +35,29 @@ app.use('/graphql', graphQLHTTP({
     rootValue: graphqlRoolValue,
     // This enable graphical URL to debug and test out app
     graphiql: true,
-    formatError: (err) => {
-        const error = getErrorCode(err.message)
+    customFormatErrorFn: (err) => {
+        console.log(err)
+        const error = getErrorCode(err.message);
         return ({ message: error.message, statusCode: error.statusCode })
     }
 }));
 
-console.log("trying to connect")
+console.log("trying to connect");
 
 // it needs connection string which contains the address of database
-mongoose.connect(`mongodb+srv://revanth:j8rw7oMNTRrtnyaa@cluster0-ewwii.mongodb.net/events-react-dev?retryWrites=true&w=majority`
+/*mongoose.connect(`mongodb+srv://revanth:j8rw7oMNTRrtnyaa@cluster0-ewwii.mongodb.net/events-react-dev?retryWrites=true&w=majority`
+).then(() => {
+    console.log("mongoDB connected");
+    mongoose.set('debug', true);
+    app.listen(app.get('port') , () => {
+        console.log("app running " + app.get('port'));
+    });
+
+}).catch(err => {
+    console.log(err);
+});*/
+
+mongoose.connect("mongodb://localhost:1234/events-react-dev"
 ).then(() => {
     console.log("mongoDB connected");
     mongoose.set('debug', true);

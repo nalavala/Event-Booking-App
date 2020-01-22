@@ -1,6 +1,7 @@
 const Booking = require('../../models/booking');
 const Event = require('../../models/event');
 const {transformBooking, transformEvent} = require('./commonresolvers');
+const {errorConstants} = require('./../error/error-contants')
 
 module.exports = {
     bookings: async (args, req) => {
@@ -18,17 +19,20 @@ module.exports = {
     },
     bookEvent: async (args, req) => {
         if (!req.isAuth) {
-            throw Error("Not Authenticated");
+            throw Error(errorConstants.NOT_AUTHENTICATED);
         }
         try {
             const fetchedEvent = await Event.findOne({_id: args.eventId});
+            const existingBooking = await Booking.findOne({event : args.eventId});
+            if(existingBooking) {
+                throw Error("Already booked for this event");
+            }
             const booking = new Booking({
                 event: fetchedEvent,
                 user: req.userId,
             });
-            const bookingResult = await booking.save();
+            await booking.save();
             console.log("event booked successfully");
-
             return transformBooking(booking);
         } catch (e) {
             throw e;
@@ -36,7 +40,7 @@ module.exports = {
     },
     cancelBooking: async (args, req) => {
         if (!req.isAuth) {
-            throw Error("Not Authenticated");
+            throw new Error(errorConstants.NOT_AUTHENTICATED);
         }
         try {
             const booking = await Booking.findById(args.bookingId).populate('event');

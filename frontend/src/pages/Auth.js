@@ -2,6 +2,8 @@ import React, { useState , useContext } from 'react';
 import AuthContext from './../context/auth-context'
 import { useSnackbar } from 'notistack';
 import './Auth.scss'
+import { APP } from "./../helper/axios/custom-axios"
+import { getCreateUserQuery, getLoginQuery } from "./../helper/graphql/auth"
 
 function AuthPage() {
     const { enqueueSnackbar } = useSnackbar();
@@ -13,7 +15,56 @@ function AuthPage() {
 
     let switchModeHandler = () => {
         setLogin(!isLogin);
-    }
+    };
+
+    /* ------------ login usecases --------------  */
+    let successLoginCallback = (response) => {
+        const loginResponse = response.data.data.login;
+        if(loginResponse) {
+            authDetails.login(loginResponse.token,loginResponse.userId, loginResponse.tokenExpiration);
+        }
+    };
+    let failureLoginCallback = (response) => {
+        if(response && response.data && response.data.errors && response.data.errors.length > 0) {
+            let errorMessage = response.data.errors[0].message;
+            enqueueSnackbar(errorMessage, {
+                variant : "error"
+            });
+        } else {
+            enqueueSnackbar("something went wrong", {
+                variant : "error"
+            });
+        }
+
+    };
+    /* ------------ login usecases --------------  */
+
+    /* ------------ create user usecases  --------------  */
+    let successCreateUserCallback = (response) => {
+        const user = response.data.data.createUser;
+        if(user) {
+            enqueueSnackbar("User created successfully", {
+                variant : "success"
+            });
+            emailElement.current.value = "";
+            passwordElement.current.value = "";
+        }
+    };
+    let failureCreateUserCallback = (response) => {
+        if(response && response.data && response.data.errors && response.data.errors.length > 0) {
+            let errorMessage = response.data.errors[0].message;
+            enqueueSnackbar(errorMessage, {
+                variant : "error"
+            });
+        } else {
+            enqueueSnackbar("something went wrong", {
+                variant : "error"
+            });
+        }
+
+    };
+    /* ------------ create user usecases  --------------  */
+
 
     let submitHandler = (event) => {
         event.preventDefault();
@@ -22,61 +73,15 @@ function AuthPage() {
         if(email.trim().length === 0 || password.trim().length === 0) {
             return;
         }
-        //console.log(email,password);
-        let requestBody = {
-            query : `query Login ($email : String!, $password : String!) {
-                login(email : $email, password : $password) {
-                    userId 
-                    email 
-                    token 
-                    tokenExpiration
-                }
-            }`,
-            variables : {
-                email,
-                password
-            }
-        };
 
-        if(!isLogin) {
-            requestBody = {
-                query:`
-                mutation CreateUser($email : String!, $password : String!){
-                  createUser(userInput : {email: $email,password: $password}) {
-                    _id
-                  }
-                }`,
-                variables : {
-                    email,
-                    password
-                }
+        if (!isLogin) {
+            APP.POST(getCreateUserQuery(email, password), successCreateUserCallback, failureCreateUserCallback);
+        } else {
+            APP.POST(getLoginQuery(email, password), successLoginCallback, failureLoginCallback);
         }
-
-        };
-
-
-        fetch('http://localhost:1742/graphql', {
-            method : 'POST',
-            body : JSON.stringify(requestBody),
-            headers : {
-                'Content-Type' : 'application/json'
-            }
-        }).then((response) => {
-            if(response.status !== 200 && response.status !== 201) {
-                console.log(response.json());
-            }
-
-            return response.json();
-        } ).then((response) => {
-            const loginResponse = response.data.login;
-            if(response.data.login) {
-                authDetails.login(loginResponse.token,loginResponse.userId, loginResponse.tokenExpiration);
-            }
-            console.log(response);
-        }).catch((e) => {
-            throw e;
-        });
     };
+
+
     return (
         <form className="auth-form" onSubmit={submitHandler}>
             <div className="form-control">
@@ -88,8 +93,8 @@ function AuthPage() {
                 <input type="password" id="password" ref={passwordElement} />
             </div>
             <div className="form-action">
-                <button type="submit">Submit</button>
-                <button type="button" onClick={switchModeHandler} >Switch to {isLogin ? "SignUp" : "Login"}</button>
+                <button className="btn" type="submit">Submit</button>
+                <button className="btn" type="button" onClick={switchModeHandler} >Switch to {isLogin ? "SignUp" : "Login"}</button>
             </div>
         </form>
     );

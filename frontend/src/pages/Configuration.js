@@ -1,5 +1,5 @@
-import React, {useState , useContext} from 'react';
-import { SketchPicker, CirclePicker } from 'react-color';
+import React, {useState, useContext} from 'react';
+import {SketchPicker, CirclePicker} from 'react-color';
 import reactCSS from 'reactcss';
 import './configuration.scss';
 import ConfigContext from './../context/config-context'
@@ -21,7 +21,7 @@ const Configuration = (props) => {
                 borderRadius: '2px',
                 background: headerColor,
             },
-            textColor : {
+            textColor: {
                 width: '36px',
                 height: '14px',
                 borderRadius: '2px',
@@ -81,37 +81,26 @@ const Configuration = (props) => {
         <div className="config">
             <div className="config_background">
                 <h1>Background</h1>
-                <div style={ styles.swatch } onClick={ handleClick.bind(this, "background") }>
-                    <div style={ styles.backgroundColor } />
+                <div style={styles.swatch} onClick={handleClick.bind(this, "background")}>
+                    <div style={styles.backgroundColor}/>
                 </div>
             </div>
             <div className="config_text">
                 <h1>Text</h1>
-                <div style={ styles.swatch } onClick={ handleClick.bind(this, "text") }>
-                    <div style={ styles.textColor } />
+                <div style={styles.swatch} onClick={handleClick.bind(this, "text")}>
+                    <div style={styles.textColor}/>
                 </div>
             </div>
             <div>
-                <button onClick={applyColorChanges}>Set</button>
+                <button className="btn" onClick={applyColorChanges}>Apply</button>
             </div>
-            { displayColorPicker ? <div style={ styles.popover }>
-                <div style={ styles.cover } onClick={ handleClose }/>
-                <SketchPicker color={ headerColor } onChange={ handleChange.bind(this,seletecItem) } />
-            </div> : null }
-            {/*<div className="config_text">
-                <h1>Text</h1>
-                <div style={ styles.swatch } onClick={ handleClick }>
-                    <div style={ styles.color } />
-                </div>
-                { displayColorPicker ? <div style={ styles.popover }>
-                    <div style={ styles.cover } onClick={ handleClose }/>
-                    <SketchPicker color={ headerColor } onChange={ handleChange } />
-                </div> : null }
-            </div>
-*/}
+            {displayColorPicker ? <div style={styles.popover}>
+                <div style={styles.cover} onClick={handleClose}/>
+                <SketchPicker color={headerColor} onChange={handleChange.bind(this, seletecItem)}/>
+            </div> : null}
 
         </div>
     )
 };
 
-export  default  Configuration;
+export default Configuration;

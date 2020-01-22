@@ -1,17 +1,17 @@
 import React, {useContext, useState, useEffect} from 'react';
 import Modal from '../modals/Modal'
-import BackDrop from "../../Backdrop";
 import AuthContext from "../../context/auth-context"
 import "./events.scss"
 import EventList from "./EventList";
 import Spinner from "./../spinner/Spinner";
 import { useSnackbar } from 'notistack';
+import {APP} from '../../helper/axios/custom-axios'
+import {getCreateEventQuery, fetchEventsQuery, bookEventQuery} from './../../helper/graphql/event'
 
 
 function EventsPage() {
     const { enqueueSnackbar } = useSnackbar();
-
-    const [creating, setEventCreatingState] = useState(false);
+    const [isEventCreating, setEventCreatingState] = useState(false);
     const [event, setEvent] = useState({
         title : "",
         price : "",
@@ -23,125 +23,125 @@ function EventsPage() {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const authContext = useContext(AuthContext);
 
+    /*---------------- Fetch Events ------------------ */
+
+    const successFetchEvents = (response) => {
+        setEvents(response.data.data.events);
+        setLoading(false);
+    };
+    const failureFetchEvents = (response) => {
+        if(response && response.data && response.data.errors && response.data.errors.length > 0) {
+            let errorMessage = response.data.errors[0].message;
+            enqueueSnackbar(errorMessage, {
+                variant : "error"
+            });
+        } else {
+            enqueueSnackbar("something went wrong", {
+                variant : "error"
+            });
+        }
+        setLoading(false);
+    };
     const fetchEvents = () => {
-        setLoading(true);
-        const  requestBody = {
-            query:`
-                query {
-  events {
-    _id
-    date
-    title
-    description
-    price
-    creator {
-        _id
-    }
-  }
-}`
-        };
-
-
-        fetch('http://localhost:1742/graphql', {
-            method : 'POST',
-            body : JSON.stringify(requestBody),
-            headers : {
-                'Content-Type' : 'application/json',
-
-            }
-        }).then((response) => {
-            if(response.status !== 200 && response.status !== 201) {
-                //TODO : dont throw error
-                throw new Error('Failed');
-            }
-
-            return response.json();
-        } ).then((response) => {
-            console.log(response.data.events)
-            setEvents(response.data.events)
-            setLoading(false);
-        }).catch((e) => {
-            setLoading(false);
-            throw e;
-        });
-
+        APP.POST(fetchEventsQuery, successFetchEvents, failureFetchEvents)
     };
     useEffect(fetchEvents, []);
 
-    const createEvent = () => {
+    /*---------------- Fetch Events --------------------- */
+    /* ---------- create Event ---------------*/
+    const successCreateEvent = (response) => {
 
-        const  requestBody = {
-            query:`
-                mutation createEvent ($title : String!, $price : Float!, $date : String!, $description : String!){
-                  createEvent(eventInput : {title: $title,price: $price,date: $date,description : $description}) {
-                    _id
-                    title
-                    date
-                    title
-                    description
-                  }
-                }`,
-            variables : {
-                title : event.title,
-                price : +event.price,
-                date : event.date,
-                description : event.description
-
+        let updatedEvents = [...events];
+        let createEvent = response.data.data.createEvent;
+        updatedEvents.push({
+            _id : createEvent._id,
+            title : createEvent.title,
+            date : createEvent.date,
+            price : createEvent.price,
+            description : createEvent.description,
+            creator : {
+                _id : authContext.userId,
             }
-
-        };
-
-
-        fetch('http://localhost:1742/graphql', {
-            method : 'POST',
-            body : JSON.stringify(requestBody),
-            headers : {
-                'Content-Type' : 'application/json',
-                'Authorization' : "Bearer " + authContext.token
-            }
-        }).then((response) => {
-            if(response.status !== 200 && response.status !== 201) {
-                //TODO : dont throw error
-                throw new Error('Failed');
-            }
-
-            return response.json();
-        } ).then((response) => {
-            let updatedEvents = [...events];
-            updatedEvents.push({
-                _id : response.data.createEvent._id,
-                title : response.data.createEvent.title,
-                date : response.data.createEvent.date,
-                price : response.data.createEvent.price,
-                description : response.data.createEvent.description,
-                creator : {
-                    _id : authContext.userId,
-                }
-            });
-            console.log("updatedEvents" + updatedEvents);
-            setEvents(updatedEvents);
-            enqueueSnackbar("Event Created Successfully", {
-                variant : "success"
-            })
-        }).catch((e) => {
-            throw e;
         });
-    }
+        setEvents(updatedEvents);
+        setEvent({
+            title : "",
+            price : "",
+            date : "",
+            description : ""
+        });
+        enqueueSnackbar("Event Created Successfully", {
+            variant : "success"
+        })
+    };
+
+    const failureCreateEvent = (response) => {
+        if(response && response.data && response.data.errors && response.data.errors.length > 0) {
+            let errorMessage = response.data.errors[0].message;
+            enqueueSnackbar(errorMessage, {
+                variant : "error"
+            });
+        } else {
+            enqueueSnackbar("something went wrong", {
+                variant : "error"
+            });
+        }
+    };
+
+    const createEvent = () => {
+        let options = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + authContext.token
+            }
+        };
+        APP.POST(getCreateEventQuery(event), successCreateEvent, failureCreateEvent, options);
+    };
+    /* ---------- create Event ---------------*/
+    /* --------------------Book Event ------------------ */
+    const successBookEventHandler = (response) => {
+        enqueueSnackbar("Event Booked Successfully", {
+            variant : "success"
+        });
+        setSelectedEvent(null);
+    };
+    const failureBookEventHandler = (response) => {
+        if(response && response.data && response.data.errors && response.data.errors.length > 0) {
+            let errorMessage = response.data.errors[0].message;
+            enqueueSnackbar(errorMessage, {
+                variant : "error"
+            });
+        } else {
+            enqueueSnackbar("something went wrong", {
+                variant : "error"
+            });
+        }
+    };
+    const bookEventHandler = (eventId) => {
+        let options = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + authContext.token
+            }
+        };
+        APP.POST(bookEventQuery(eventId), successBookEventHandler, failureBookEventHandler, options);
+    };
+    /* --------------------Book Event ------------------ */
 
 
-    const handleInputValueChanged = (context, evnt) => {
+    const handleInputValueChanged = (context, event) => {
         switch (context) {
             case "title" :
-                setEvent({...event, title : evnt.target.value});
+                setEvent({...event, title : event.target.value});
                 break;
             case "price" :
-                setEvent({...event, price : evnt.target.value});
+                setEvent({...event, price : event.target.value});
                 break;
             case "date":
-                setEvent({...event, date : evnt.target.value});
+                setEvent({...event, date : event.target.value});
                 break;
             case "description" :
-                setEvent({...event, description : evnt.target.value});
+                setEvent({...event, description : event.target.value});
                 break;
         }
     };
@@ -154,7 +154,7 @@ function EventsPage() {
     };
 
     const handleCreateEventClicked = () => {
-        setEventCreatingState(!creating)
+        setEventCreatingState(!isEventCreating)
     };
 
     const createEventHandler = () => {
@@ -162,58 +162,16 @@ function EventsPage() {
         setEventCreatingState(false);
         setSelectedEvent(null);
     };
-    const bookEventHandler = (eventId) => {
-        console.log(eventId);
 
-
-
-        const  requestBody = {
-            query:`
-                mutation {
-  bookEvent(eventId : "${eventId}") {
-    _id
-  }
-}`
-        };
-
-
-        fetch('http://localhost:1742/graphql', {
-            method : 'POST',
-            body : JSON.stringify(requestBody),
-            headers : {
-                'Content-Type' : 'application/json',
-                'Authorization' : "Bearer " + authContext.token
-            }
-        }).then((response) => {
-            if(response.status !== 200 && response.status !== 201) {
-                //TODO : dont throw error
-                throw new Error('Failed');
-            }
-
-            enqueueSnackbar("Event Booked Successfully", {
-                variant : "success"
-            });
-            return response.json();
-        } ).then((response) => {
-            console.log(response);
-        }).catch((e) => {
-            throw e;
-        });
-
-
-        setSelectedEvent(null);
-    };
     const modalCancelHandler = () => {
         setEventCreatingState(false);
         setSelectedEvent(null);
     };
 
     const getViewAccordingContext = () => {
-        if (creating) {
-            return (
-                <>
-                    <BackDrop/>
-                    <Modal title="Create Event"
+        let modalView = null;
+        if (isEventCreating) {
+            modalView =  <Modal title="Create Event"
                            cancelHandler={modalCancelHandler}
                            confirmHandler={createEventHandler}
                            confrimText = "CreateEvent">
@@ -236,19 +194,14 @@ function EventsPage() {
                             </div>
                         </form>
                     </Modal>
-                </>
-            )
         }
 
-        if(selectedEvent) {
-            return <>
-                <BackDrop/>
-                <Modal
+        if (selectedEvent) {
+            modalView = <Modal
                     title="Create Event"
-                    confrimText = "BookEvent"
+                    confrimText="BookEvent"
                     cancelHandler={modalCancelHandler}
                     confirmHandler={bookEventHandler.bind(this, selectedEvent._id)}>
-
 
                     <h1>
                         {selectedEvent.title}
@@ -258,14 +211,13 @@ function EventsPage() {
                     </h2>
                     <p>{selectedEvent.description}</p>
                 </Modal>
-            </>
         }
 
         let  createEventView = null;
         if(authContext.token) {
             createEventView = <div className="event-control">
                 <p>Share your own Events!</p>
-                <button onClick={handleCreateEventClicked}>
+                <button className="btn" onClick={handleCreateEventClicked}>
                     Create button
                 </button>
 
@@ -274,6 +226,7 @@ function EventsPage() {
 
         return <>
             {createEventView}
+            {modalView}
             {isLoading ? <Spinner /> : <EventList viewDetailsHandler = {viewDetailsHandler} events={events} />}
         </>
 

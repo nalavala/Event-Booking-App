@@ -11,6 +11,7 @@ import ConfigContext from './context/config-context';
 
 function App() {
 
+    console.log("modee " + process.env.NODE_ENV);
     let [authDetails, setAuthDetails] = useState({
         token : null,
         userId : null,
@@ -47,6 +48,7 @@ function App() {
             color : newColor
         })
     };
+
 
     return (
         <BrowserRouter>

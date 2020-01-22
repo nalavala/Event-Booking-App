@@ -31,8 +31,13 @@
       justify-content: space-around;
       align-items: center;
 
+      .inprogress::after {
+        content : "inprogress"
+      }
+
       li {
         margin: 0 0.5rem;
+
 
         a,button {
           text-decoration: none;

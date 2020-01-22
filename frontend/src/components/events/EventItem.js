@@ -20,7 +20,7 @@ const EventItem = (props) => {
             </div>
             <div className="event_list_item_actions">
                 {
-                    !isUserCreator ? <button onClick={eventViewHandler.bind(this, props.eventId)}>View Details</button> :
+                    !isUserCreator ? <button className="btn" onClick={eventViewHandler.bind(this, props.eventId)}>View Details</button> :
                         <p> you are owner of this event</p>
                 }
 
